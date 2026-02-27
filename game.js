@@ -74,7 +74,7 @@
     // HTML5 Audio for BGM
     AUDIO.bgm = new Audio('sfx/bgm.mp3');
     AUDIO.bgm.preload = 'auto';
-    AUDIO.bgm.volume = 0.3;
+    AUDIO.bgm.volume = 0.1;
     AUDIO.bgm.loop = true;
 
     // Web Audio API for SFX
