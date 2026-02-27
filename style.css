@@ -61,7 +61,7 @@ html, body {
 .btn:active { transform: scale(.95); }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--c-pink), var(--c-yellow));
+  background: linear-gradient(90deg, var(--c-pink), var(--c-yellow));
   color: #fff;
   box-shadow: 0 4px 18px rgba(255,107,157,.35);
 }
@@ -99,30 +99,39 @@ html, body {
 .mochi-rainbow { background-image: url('assets/RAINBOW.png'); }
 
 /* ===== ATTRACT SCREEN ===== */
-.attract-content .title {
-  font-size: 3.2rem; font-weight: 700;
-  letter-spacing: .06em;
-  background: linear-gradient(135deg, var(--c-pink), var(--c-blue));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: .3rem;
-}
-.attract-content .subtitle {
-  font-size: 1.1rem; font-weight: 600;
-  color: #7a6b8a;
+.masthead-container {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
   margin-bottom: 1.5rem;
 }
+.masthead-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
 
-.attract-mochis {
-  display: flex; gap: 1.2rem;
-  margin-bottom: 2rem;
-}
 .float-mochi {
-  width: 72px; height: 72px;
+  position: absolute;
+  z-index: 3;
 }
-.float-mochi:nth-child(1) { animation: floatA 3.2s ease-in-out infinite; }
-.float-mochi:nth-child(2) { animation: floatB 3.6s ease-in-out infinite .4s; }
-.float-mochi:nth-child(3) { animation: floatC 3s   ease-in-out infinite .8s; }
+.fm-pos-1 {
+  top: -8%; left: 8%;
+  width: 65px; height: 65px;
+  animation: floatA 3.2s ease-in-out infinite;
+}
+.fm-pos-2 {
+  top: 15%; right: -5%;
+  width: 80px; height: 80px;
+  animation: floatB 3.6s ease-in-out infinite .4s;
+}
+.fm-pos-3 {
+  bottom: -22%; left: -2%;
+  width: 75px; height: 75px;
+  animation: floatC 3s ease-in-out infinite .8s;
+}
 
 @keyframes floatA {
   0%, 100% { transform: translateY(0) rotate(-4deg) scale(1.25); }
