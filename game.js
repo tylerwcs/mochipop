@@ -52,7 +52,7 @@
     ctx: null,
     buffers: {},
     volumes: {},
-    sfxMaster: 1.4,   // bump SFX a bit above BGM, esp. on mobile
+    sfxMaster: 2.4,   // bump SFX a bit above BGM, esp. on mobile
   };
 
   async function loadSfx(src, volume) {
