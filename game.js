@@ -51,7 +51,8 @@
     bgm: null,
     ctx: null,
     buffers: {},
-    volumes: {}
+    volumes: {},
+    sfxMaster: 1.4,   // bump SFX a bit above BGM, esp. on mobile
   };
 
   async function loadSfx(src, volume) {
@@ -71,22 +72,22 @@
     if (AUDIO.initialized) return;
     AUDIO.initialized = true;
 
-    // HTML5 Audio for BGM
+    // HTML5 Audio for BGM (kept a bit lower so SFX stand out)
     AUDIO.bgm = new Audio('sfx/bgm.mp3');
     AUDIO.bgm.preload = 'auto';
-    AUDIO.bgm.volume = 0.1;
+    AUDIO.bgm.volume = 0.22;
     AUDIO.bgm.loop = true;
 
     // Web Audio API for SFX
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (AudioContext) {
       AUDIO.ctx = new AudioContext();
-      loadSfx('sfx/bomb.wav', 0.75);
-      loadSfx('sfx/clearline.wav', 0.7);
-      loadSfx('sfx/clearline2.mp3', 0.65);
-      loadSfx('sfx/end.wav', 0.8);
+      loadSfx('sfx/bomb.wav', 1.0);
+      loadSfx('sfx/clearline.wav', 0.95);
+      loadSfx('sfx/clearline2.mp3', 0.9);
+      loadSfx('sfx/end.wav', 1.05);
       for (let i = 1; i <= 6; i++) {
-        loadSfx(`sfx/pop${i}.mp3`, 0.65);
+        loadSfx(`sfx/pop${i}.mp3`, 0.95);
       }
     }
   }
@@ -110,7 +111,8 @@
     source.buffer = AUDIO.buffers[src];
 
     const gainNode = AUDIO.ctx.createGain();
-    gainNode.gain.value = AUDIO.volumes[src] || 1;
+    const baseVol = AUDIO.volumes[src] || 1;
+    gainNode.gain.value = baseVol * (AUDIO.sfxMaster || 1);
 
     source.connect(gainNode);
     gainNode.connect(AUDIO.ctx.destination);
