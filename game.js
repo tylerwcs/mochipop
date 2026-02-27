@@ -74,7 +74,7 @@
     // HTML5 Audio for BGM
     AUDIO.bgm = new Audio('sfx/bgm.mp3');
     AUDIO.bgm.preload = 'auto';
-    AUDIO.bgm.volume = 0.35;
+    AUDIO.bgm.volume = 0.3;
     AUDIO.bgm.loop = true;
 
     // Web Audio API for SFX
@@ -86,7 +86,7 @@
       loadSfx('sfx/clearline2.mp3', 0.65);
       loadSfx('sfx/end.wav', 0.8);
       for (let i = 1; i <= 6; i++) {
-        loadSfx(`sfx/pop${i}.mp3`, 0.55);
+        loadSfx(`sfx/pop${i}.mp3`, 0.65);
       }
     }
   }
