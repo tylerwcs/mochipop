@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mochi Pop — MOCHITAKE OVER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- START PAGE -->
+    <div id="screen-attract" class="screen active">
+      <div class="screen-inner attract-content">
+        <div class="attract-mochis">
+          <div class="float-mochi fm-yellow"></div>
+          <div class="float-mochi fm-pink"></div>
+          <div class="float-mochi fm-blue"></div>
+        </div>
+        <h1 class="title">MOCHI POP</h1>
+        <p class="subtitle">SWIPE TO MATCH 3 MOCHI</p>
+        <div class="nickname-form">
+          <input type="text" id="nickname-input" class="nickname-input" placeholder="Enter Nickname" maxlength="12" />
+          <button id="btn-start" class="btn btn-primary">NEXT</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSTRUCTIONS -->
+    <div id="screen-instructions" class="screen">
+      <div class="screen-inner instructions-content">
+        <h2>HOW TO PLAY</h2>
+        <div class="instruction-steps">
+          <div class="step">
+            <div class="step-icon">
+              <div class="mini-mochi fm-yellow"></div>
+              <svg class="swipe-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-4-4 4 4-4 4"/></svg>
+              <div class="mini-mochi fm-pink"></div>
+            </div>
+            <p>Swipe to swap two adjacent mochi</p>
+          </div>
+          <div class="step">
+            <div class="step-icon triple">
+              <div class="mini-mochi fm-blue"></div>
+              <div class="mini-mochi fm-blue"></div>
+              <div class="mini-mochi fm-blue"></div>
+            </div>
+            <p>Match 3 or more of the same colour to pop!</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <div class="mini-mochi mochi-bomb"></div>
+              <div class="mini-mochi mochi-rainbow"></div>
+            </div>
+            <p>Match 4+ to create power-up mochi with special abilities!</p>
+          </div>
+        </div>
+        <div class="tap-prompt pulse">TAP TO PLAY</div>
+      </div>
+    </div>
+
+    <!-- GAMEPLAY -->
+    <div id="screen-gameplay" class="screen">
+      <div class="hud">
+        <div class="hud-cell">
+          <div class="hud-label">SCORE</div>
+          <div id="score-display" class="hud-value">0</div>
+        </div>
+        <div class="hud-cell hud-timer">
+          <div class="hud-label">TIME</div>
+          <div class="timer-bar-track">
+            <div id="timer-bar" class="timer-bar-fill"></div>
+          </div>
+          <div id="timer-display" class="hud-value timer-value">45</div>
+        </div>
+      </div>
+      <div id="grid-container">
+        <div id="grid"></div>
+      </div>
+      <div id="combo-display" class="combo-display hidden"></div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="screen-result" class="screen">
+      <div class="screen-inner result-content">
+        <div id="result-particles"></div>
+        <div id="result-icon" class="result-icon"></div>
+        <h2 id="result-title">TIME'S UP!</h2>
+        <div id="result-score" class="result-score"></div>
+
+        <div class="leaderboard-container">
+          <h3>LEADERBOARD</h3>
+          <ul id="leaderboard-list"></ul>
+        </div>
+
+        <div class="result-buttons">
+          <button id="btn-play-again" class="btn btn-primary">PLAY AGAIN</button>
+          <button id="btn-quit" class="btn btn-secondary">MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BRAND END REMOVED -->
+
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
