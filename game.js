@@ -49,73 +49,93 @@
     initialized: false,
     unlocked: false,
     bgm: null,
-    sfx: {
-      bomb: null,
-      clearLine: null,
-      combo: null,
-      end: null,
-    },
-    popVariants: [],
+    ctx: null,
+    buffers: {},
+    volumes: {}
   };
 
-  function createAudio(src, { volume = 1, loop = false } = {}) {
-    const audio = new Audio(src);
-    audio.preload = 'auto';
-    audio.volume = volume;
-    audio.loop = loop;
-    return audio;
+  async function loadSfx(src, volume) {
+    AUDIO.volumes[src] = volume;
+    try {
+      const response = await fetch(src);
+      const arrayBuffer = await response.arrayBuffer();
+      if (AUDIO.ctx) {
+        AUDIO.buffers[src] = await AUDIO.ctx.decodeAudioData(arrayBuffer);
+      }
+    } catch (e) {
+      console.warn('Failed to load audio:', src, e);
+    }
   }
 
   function initAudio() {
     if (AUDIO.initialized) return;
     AUDIO.initialized = true;
 
-    AUDIO.bgm = createAudio('sfx/bgm.mp3', { volume: 0.35, loop: true });
-    AUDIO.sfx.bomb = createAudio('sfx/bomb.wav', { volume: 0.75 });
-    AUDIO.sfx.clearLine = createAudio('sfx/clearline.wav', { volume: 0.7 });
-    AUDIO.sfx.combo = createAudio('sfx/clearline2.mp3', { volume: 0.65 });
-    AUDIO.sfx.end = createAudio('sfx/end.wav', { volume: 0.8 });
-    AUDIO.popVariants = [1, 2, 3, 4, 5, 6].map(i => createAudio(`sfx/pop${i}.mp3`, { volume: 0.55 }));
+    // HTML5 Audio for BGM
+    AUDIO.bgm = new Audio('sfx/bgm.mp3');
+    AUDIO.bgm.preload = 'auto';
+    AUDIO.bgm.volume = 0.35;
+    AUDIO.bgm.loop = true;
+
+    // Web Audio API for SFX
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) {
+      AUDIO.ctx = new AudioContext();
+      loadSfx('sfx/bomb.wav', 0.75);
+      loadSfx('sfx/clearline.wav', 0.7);
+      loadSfx('sfx/clearline2.mp3', 0.65);
+      loadSfx('sfx/end.wav', 0.8);
+      for (let i = 1; i <= 6; i++) {
+        loadSfx(`sfx/pop${i}.mp3`, 0.55);
+      }
+    }
   }
 
   function unlockAudio() {
     initAudio();
     if (AUDIO.unlocked) return;
     AUDIO.unlocked = true;
+
+    // Unlock Web Audio Context
+    if (AUDIO.ctx && AUDIO.ctx.state === 'suspended') {
+      AUDIO.ctx.resume();
+    }
   }
 
-  function playAudioOneShot(audio) {
-    if (!audio) return;
-    const shot = audio.cloneNode(true);
-    shot.volume = audio.volume;
-    shot.currentTime = 0;
-    shot.play().catch(() => {});
+  function playSfx(src) {
+    if (!AUDIO.unlocked || !AUDIO.ctx || !AUDIO.buffers[src]) return;
+    if (AUDIO.ctx.state === 'suspended') AUDIO.ctx.resume();
+
+    const source = AUDIO.ctx.createBufferSource();
+    source.buffer = AUDIO.buffers[src];
+
+    const gainNode = AUDIO.ctx.createGain();
+    gainNode.gain.value = AUDIO.volumes[src] || 1;
+
+    source.connect(gainNode);
+    gainNode.connect(AUDIO.ctx.destination);
+    source.start(0);
   }
 
   function playPop(chain) {
-    if (!AUDIO.unlocked || AUDIO.popVariants.length === 0) return;
-    const idx = clamp(chain - 1, 0, AUDIO.popVariants.length - 1);
-    playAudioOneShot(AUDIO.popVariants[idx]);
+    const idx = clamp(chain, 1, 6);
+    playSfx(`sfx/pop${idx}.mp3`);
   }
 
   function playBombSfx() {
-    if (!AUDIO.unlocked) return;
-    playAudioOneShot(AUDIO.sfx.bomb);
+    playSfx('sfx/bomb.wav');
   }
 
   function playLineClearSfx() {
-    if (!AUDIO.unlocked) return;
-    playAudioOneShot(AUDIO.sfx.clearLine);
+    playSfx('sfx/clearline.wav');
   }
 
   function playComboSfx() {
-    if (!AUDIO.unlocked) return;
-    playAudioOneShot(AUDIO.sfx.combo);
+    playSfx('sfx/clearline2.mp3');
   }
 
   function playEndSfx() {
-    if (!AUDIO.unlocked) return;
-    playAudioOneShot(AUDIO.sfx.end);
+    playSfx('sfx/end.wav');
   }
 
   function startBgm() {
