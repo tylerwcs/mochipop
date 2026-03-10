@@ -138,12 +138,12 @@ html, body {
   animation: floatA 3.2s ease-in-out infinite;
 }
 .fm-pos-2 {
-  top: 15%; right: -2%;
+  top: 15%; right: -12%;
   width: 5rem; height: 5rem;
   animation: floatB 3.6s ease-in-out infinite .4s;
 }
 .fm-pos-3 {
-  bottom: -22%; left: -0%;
+  bottom: -22%; left: -8%;
   width: 4.5rem; height: 4.5rem;
   animation: floatC 3s ease-in-out infinite .8s;
 }
