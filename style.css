@@ -375,8 +375,8 @@ html, body {
 }
 .bomb-product-particle {
   position: absolute;
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 29;
@@ -494,8 +494,8 @@ html, body {
 }
 .rainbow-product-spark {
   position: absolute;
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 29;
