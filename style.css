@@ -694,12 +694,19 @@ html, body {
 #leaderboard-list .score { color: var(--c-blue); font-weight: 700; text-align: right; }
 
 /* ===== RESPONSIVE ===== */
-@media (max-height: 580px) {
-  .hud { padding: .4rem .6rem .3rem; }
-  .hud-value { font-size: 1.2rem; }
-  .instructions-content h2 { font-size: 1.4rem; margin-bottom: 1rem; }
+@media (max-width: 600px), (max-height: 800px) {
+  .hud { padding: .4rem .8rem .3rem; }
+  .hud-value { font-size: 1.3rem; }
+  .instructions-content h2 { font-size: 1.5rem; margin-bottom: 1rem; }
   .step { padding: .7rem .9rem; }
-  .play-masthead { max-width: 220px; }
-  .play-footer-logo { max-width: 110px; }
-  #screen-gameplay { padding: 2vh 1rem 2vh; gap: 1.5vh; }
+  .play-masthead { max-width: 260px; }
+  .play-footer-logo { max-width: 140px; }
+  #screen-gameplay { padding: 2vh 1rem; gap: 1.5vh; }
+  .result-masthead { max-width: 200px; }
+}
+
+@media (max-height: 600px) {
+  .play-masthead { max-width: 200px; }
+  .play-footer-logo { max-width: 100px; }
+  #screen-gameplay { padding: 1.5vh 1rem; gap: 1vh; }
 }
