@@ -531,20 +531,51 @@
     gridEl.appendChild(flash);
     els.push(flash);
 
-    const count = 10;
-    for (let i = 0; i < count; i++) {
+    const productCount = 4;
+    for (let i = 0; i < productCount; i++) {
       const p = document.createElement('div');
       p.className = 'bomb-product-particle';
       p.style.left = cx + 'px';
       p.style.top  = cy + 'px';
-      const angle = (Math.PI * 2 * i / count) + (Math.random() - 0.5) * 0.25;
-      const dist  = cellSize * (1.0 + Math.random() * 2.0);
+      const angle = (Math.PI * 2 * i / productCount) + (Math.random() - 0.5);
+      const dist  = cellSize * (1.2 + Math.random() * 1.5);
       p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
       p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
       p.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
       p.style.animationDelay = (Math.random() * 60) + 'ms';
       const img = PRODUCT_IMGS[rng(PRODUCT_IMGS.length)];
       p.style.backgroundImage = `url('${img}')`;
+      gridEl.appendChild(p);
+      els.push(p);
+    }
+
+    const sparkCount = 15;
+    for (let i = 0; i < sparkCount; i++) {
+      const p = document.createElement('div');
+      p.className = 'bomb-particle';
+      p.style.left = cx + 'px';
+      p.style.top  = cy + 'px';
+      const angle = (Math.PI * 2 * i / sparkCount) + (Math.random() - 0.5);
+      const dist  = cellSize * (0.8 + Math.random() * 1.5);
+      p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      p.style.animationDelay = (Math.random() * 40) + 'ms';
+      gridEl.appendChild(p);
+      els.push(p);
+    }
+
+    const starCount = 6;
+    for (let i = 0; i < starCount; i++) {
+      const p = document.createElement('div');
+      p.className = 'bomb-star';
+      p.style.left = cx + 'px';
+      p.style.top  = cy + 'px';
+      const angle = (Math.PI * 2 * i / starCount) + (Math.random() - 0.5);
+      const dist  = cellSize * (1.0 + Math.random() * 1.8);
+      p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+      p.style.animationDelay = (Math.random() * 30) + 'ms';
       gridEl.appendChild(p);
       els.push(p);
     }
@@ -1018,7 +1049,6 @@
 
     const rc = $('screen-result').querySelector('.result-content');
     rc.className = 'result-content screen-inner';
-    $('result-icon').textContent = '⏱️';
     $('result-score').textContent = 'Score: ' + score;
 
     $('btn-quit').style.display = 'inline-block';
