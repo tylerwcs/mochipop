@@ -20,6 +20,7 @@
   const POWERUP_NONE = 0;
   const POWERUP_BOMB = 1;
   const POWERUP_LINE = 2;
+  const POWERUP_ZAP = 3;
 
   const ANIM = {
     swap:    250,   // ms
@@ -93,6 +94,7 @@
       AUDIO.ctx = new AudioContext();
       loadSfx('sfx/bomb.wav', 1.0);
       loadSfx('sfx/clearline.wav', 0.95);
+      loadSfx('sfx/zap.wav', 1.0);
       loadSfx('sfx/clearline2.mp3', 0.9);
       loadSfx('sfx/end.wav', 1.05);
       for (let i = 1; i <= 6; i++) {
@@ -150,6 +152,10 @@
 
   function playLineClearSfx() {
     playSfx('sfx/clearline.wav');
+  }
+
+  function playZapSfx() {
+    playSfx('sfx/zap.wav');
   }
 
   function playComboSfx() {
@@ -256,6 +262,7 @@
     const pu = powerUpGrid[row][col];
     if (pu === POWERUP_BOMB) cell.classList.add('powerup-bomb');
     else if (pu === POWERUP_LINE) cell.classList.add('powerup-rainbow');
+    else if (pu === POWERUP_ZAP) cell.classList.add('powerup-zap');
 
     cell.style.width  = cellSize + 'px';
     cell.style.height = cellSize + 'px';
@@ -266,6 +273,8 @@
       mochi.className = 'mochi mochi-bomb';
     } else if (pu === POWERUP_LINE) {
       mochi.className = 'mochi mochi-rainbow';
+    } else if (pu === POWERUP_ZAP) {
+      mochi.className = 'mochi mochi-zap';
     } else {
       mochi.className = 'mochi mochi-' + COLOR_NAMES[colorIdx];
     }
@@ -334,7 +343,7 @@
         if (runLen >= 3) {
           const cells = new Set();
           for (let k = runStart; k < c; k++) cells.add(r * COLS + k);
-          groups.push({ cells, length: runLen, horizontal: true });
+          groups.push({ cells, length: runLen, horizontal: true, color: grid[r][runStart] });
         }
         runStart = c;
       }
@@ -348,7 +357,7 @@
         if (runLen >= 3) {
           const cells = new Set();
           for (let k = runStart; k < r; k++) cells.add(k * COLS + c);
-          groups.push({ cells, length: runLen, horizontal: false });
+          groups.push({ cells, length: runLen, horizontal: false, color: grid[runStart][c] });
         }
         runStart = r;
       }
@@ -531,7 +540,7 @@
     gridEl.appendChild(flash);
     els.push(flash);
 
-    const productCount = 4;
+    const productCount = 6;
     for (let i = 0; i < productCount; i++) {
       const p = document.createElement('div');
       p.className = 'bomb-product-particle';
@@ -585,7 +594,106 @@
     setTimeout(() => {
       els.forEach(e => e.remove());
       gridEl.classList.remove('shake');
-    }, 1000);
+    }, 1300);
+  }
+
+  function showZapEffect(r, c, targetColor) {
+    const cx = c * cellSize + cellSize / 2;
+    const cy = r * cellSize + cellSize / 2;
+    const els = [];
+
+    const flash = document.createElement('div');
+    flash.className = 'bomb-flash';
+    flash.style.left = cx + 'px';
+    flash.style.top  = cy + 'px';
+    flash.style.background = 'radial-gradient(circle, #fff 0%, rgba(200,200,200,.8) 40%, transparent 70%)';
+    gridEl.appendChild(flash);
+    els.push(flash);
+
+    if (targetColor !== undefined) {
+      for (let rr = 0; rr < ROWS; rr++) {
+        for (let cc = 0; cc < COLS; cc++) {
+          if (grid[rr][cc] === targetColor) {
+            const tcx = cc * cellSize + cellSize / 2;
+            const tcy = rr * cellSize + cellSize / 2;
+            
+            const dx = tcx - cx;
+            const dy = tcy - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
+
+            const zap = document.createElement('div');
+            zap.className = 'zap-line';
+            zap.style.left = cx + 'px';
+            zap.style.top = cy + 'px';
+            zap.style.width = dist + 'px';
+            zap.style.setProperty('--angle', `${angle}rad`);
+            gridEl.appendChild(zap);
+            els.push(zap);
+            
+            const tFlash = document.createElement('div');
+            tFlash.className = 'zap-target-flash';
+            tFlash.style.left = tcx + 'px';
+            tFlash.style.top = tcy + 'px';
+            gridEl.appendChild(tFlash);
+            els.push(tFlash);
+
+            const p = document.createElement('div');
+            p.className = 'zap-product-pop';
+            p.style.left = tcx + 'px';
+            p.style.top  = tcy + 'px';
+            p.style.setProperty('--rot', (Math.random() * 40 - 20) + 'deg');
+            p.style.animationDelay = (Math.random() * 40) + 'ms';
+            const img = PRODUCT_IMGS[rng(PRODUCT_IMGS.length)];
+            p.style.backgroundImage = `url('${img}')`;
+            gridEl.appendChild(p);
+            els.push(p);
+          }
+        }
+      }
+    }
+
+    const sparkCount = 20;
+    for (let i = 0; i < sparkCount; i++) {
+      const p = document.createElement('div');
+      p.className = 'bomb-particle';
+      p.style.left = cx + 'px';
+      p.style.top  = cy + 'px';
+      p.style.background = '#aaaaaa';
+      p.style.boxShadow = '0 0 8px 2px rgba(150,150,150,.7)';
+      const angle = (Math.PI * 2 * i / sparkCount);
+      const dist  = cellSize * (1.5 + Math.random() * 2.5);
+      p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      p.style.animationDelay = (Math.random() * 40) + 'ms';
+      gridEl.appendChild(p);
+      els.push(p);
+    }
+
+    const productCount = 6;
+    for (let i = 0; i < productCount; i++) {
+      const p = document.createElement('div');
+      p.className = 'bomb-product-particle';
+      p.style.left = cx + 'px';
+      p.style.top  = cy + 'px';
+      const angle = (Math.PI * 2 * i / productCount) + (Math.random() - 0.5);
+      const dist  = cellSize * (1.2 + Math.random() * 1.5);
+      p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      p.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+      p.style.animationDelay = (Math.random() * 60) + 'ms';
+      const img = PRODUCT_IMGS[rng(PRODUCT_IMGS.length)];
+      p.style.backgroundImage = `url('${img}')`;
+      gridEl.appendChild(p);
+      els.push(p);
+    }
+
+    gridEl.classList.add('shake');
+
+    setTimeout(() => {
+      els.forEach(e => e.remove());
+      gridEl.classList.remove('shake');
+    }, 1300);
   }
 
   function showRainbowEffect(r, c) {
@@ -620,25 +728,34 @@
     gridEl.appendChild(crossFlash);
     els.push(crossFlash);
 
-    const sparkCount = 12;
+    const sparkCount = 16;
     for (let i = 0; i < sparkCount; i++) {
       const s = document.createElement('div');
       s.className = 'rainbow-product-spark';
       s.style.left = cx + 'px';
       s.style.top  = cy + 'px';
-      const angle = (Math.PI * 2 * i / sparkCount) + (Math.random() - 0.5) * 0.25;
-      const dist  = cellSize * (1.0 + Math.random() * 2.0);
-      s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-      s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      
+      const dir = i % 4;
+      let dx = 0, dy = 0;
+      const dist = cellSize * (1.5 + Math.random() * 3.5);
+      const spread = (Math.random() - 0.5) * (cellSize * 0.6);
+
+      if (dir === 0) { dx = dist; dy = spread; }
+      else if (dir === 1) { dx = -dist; dy = spread; }
+      else if (dir === 2) { dx = spread; dy = dist; }
+      else if (dir === 3) { dx = spread; dy = -dist; }
+
+      s.style.setProperty('--dx', dx + 'px');
+      s.style.setProperty('--dy', dy + 'px');
       s.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
-      s.style.animationDelay = (Math.random() * 60) + 'ms';
+      s.style.animationDelay = (Math.random() * 100) + 'ms';
       const img = PRODUCT_IMGS[rng(PRODUCT_IMGS.length)];
       s.style.backgroundImage = `url('${img}')`;
       gridEl.appendChild(s);
       els.push(s);
     }
 
-    setTimeout(() => els.forEach(e => e.remove()), 1000);
+    setTimeout(() => els.forEach(e => e.remove()), 1300);
   }
 
   /* ---------- cascade loop ---------- */
@@ -650,7 +767,11 @@
     while (gameActive) {
       const groups = findMatchGroups();
       const allMatched = new Set();
-      for (const g of groups) for (const idx of g.cells) allMatched.add(idx);
+      const matchedColors = new Set();
+      for (const g of groups) {
+        for (const idx of g.cells) allMatched.add(idx);
+        matchedColors.add(g.color);
+      }
       if (allMatched.size === 0) break;
       chain++;
       playPop(chain);
@@ -658,6 +779,17 @@
       /* --- classify matches to earn power-ups --- */
       const merged = mergeOverlappingGroups(groups);
       const pendingPowerUps = [];
+
+      if (chain === 8 || chain === 12 || chain === 16) {
+        let spawnCol = -1;
+        if (isFirstRound && swapC1 !== undefined) {
+          spawnCol = Math.random() > 0.5 ? swapC1 : swapC2;
+        } else {
+          const arr = [...allMatched];
+          spawnCol = arr[Math.floor(arr.length / 2)] % COLS;
+        }
+        pendingPowerUps.push({ type: POWERUP_ZAP, col: spawnCol });
+      }
 
       for (const mg of merged) {
         let puType = POWERUP_NONE;
@@ -689,6 +821,7 @@
 
       /* --- chain-react: activate power-ups caught in the blast --- */
       const activated = new Set();
+      const zapTargets = new Map();
       let changed = true;
       while (changed) {
         changed = false;
@@ -727,6 +860,31 @@
                 changed = true;
               }
             }
+          } else if (pu === POWERUP_ZAP) {
+            const colorsPresent = [];
+            for (let rr = 0; rr < ROWS; rr++) {
+              for (let cc = 0; cc < COLS; cc++) {
+                const colIdx = grid[rr][cc];
+                if (colIdx !== -1 && !colorsPresent.includes(colIdx)) {
+                  colorsPresent.push(colIdx);
+                }
+              }
+            }
+            if (colorsPresent.length > 0) {
+              const targetColor = colorsPresent[rng(colorsPresent.length)];
+              zapTargets.set(idx, targetColor);
+              for (let rr = 0; rr < ROWS; rr++) {
+                for (let cc = 0; cc < COLS; cc++) {
+                  if (grid[rr][cc] === targetColor) {
+                    const ni = rr * COLS + cc;
+                    if (!toDestroy.has(ni)) {
+                      toDestroy.add(ni);
+                      changed = true;
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -742,6 +900,7 @@
       let hasActivation = false;
       let playedBomb = false;
       let playedLine = false;
+      let playedZap = false;
       for (const idx of activated) {
         const r = Math.floor(idx / COLS), c = idx % COLS;
         if (powerUpGrid[r][c] === POWERUP_BOMB) {
@@ -757,6 +916,14 @@
           if (!playedLine) {
             playLineClearSfx();
             playedLine = true;
+          }
+        } else if (powerUpGrid[r][c] === POWERUP_ZAP) {
+          const targetColor = zapTargets.get(idx);
+          showZapEffect(r, c, targetColor);
+          hasActivation = true;
+          if (!playedZap) {
+            playZapSfx();
+            playedZap = true;
           }
         }
       }
